@@ -12,7 +12,7 @@ function App() {
           <ambientLight intensity={0.5} />
           <directionalLight position={[0, 0, 10]} />
           <PlaneComponent />
-          <OrbitControls enableDamping enableZoom={false} />
+          {/* <OrbitControls enableDamping enableZoom={false} /> */}
         </Canvas>
       </div>
       
