@@ -18,6 +18,17 @@ const PlaneMaterial = shaderMaterial(
   planeFragmentShader
 );
 
+// Set default material properties on the prototype
+Object.assign(PlaneMaterial.prototype, {
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.CustomBlending,
+  premultipliedAlpha: true,
+  blendEquation: THREE.AddEquation,
+  blendSrc: THREE.OneFactor,
+  blendDst: THREE.OneMinusSrcAlphaFactor,
+});
+
 // Make shader material available in JSX
 extend({ PlaneMaterial });
 
@@ -33,6 +44,7 @@ const PlaneComponent = () => {
   const initialScrollY = 0;
   const [scrollY, setScrollY] = useState(initialScrollY);
   const [clickedPlane, setClickedPlane] = useState<number | null>(null);
+  const [clmpScrollY, setClmpScrollY] = useState(initialScrollY);
 
 
   const planeRefs = useRef<(THREE.Mesh | null)[]>([]);
@@ -54,7 +66,7 @@ const PlaneComponent = () => {
   // const maxScroll = (totalPlanes - 1) * planeSpacing * 3000; // Max scroll amount based on the total number of planes
   
   // TO DO: Replace next line with a formula that calculates the max scroll based on the total number of planes
-  const maxScroll = 320;
+  const maxScroll = 6000;
 
   useEffect(() => {
     if (textures) {
@@ -63,12 +75,14 @@ const PlaneComponent = () => {
         if (plane) {
           const material = plane.material as THREE.ShaderMaterial;
           material.uniforms.uTexture.value = textures[index]; // Set texture as uniform
+          // Align first plane with initial scroll position
           material.uniforms.progress.value = -1.0 * (initialScrollY * 0.001 + planeSpacing * index);
+          
           material.needsUpdate = true; // Force update to re-render
 
           // Store the plane's index in userData
           plane.userData = { index };
-          console.log('plane.userData.index :>> ', plane.userData.index);
+          // console.log('plane.userData.index :>> ', plane.userData.index);
         }
       });
     }
@@ -88,19 +102,21 @@ const PlaneComponent = () => {
 
       // Clamp the scrollY value to prevent scrolling beyond the first and last plane
       const clampedScrollY = Math.min(Math.max(newScrollY, minScroll), maxScroll);
-
+      setClmpScrollY(clampedScrollY);
+      
       setScrollY(clampedScrollY); // Track scroll position
   
       // Update progress based on scroll
       planeRefs.current.forEach((plane, index) => {
         if (plane) {
           const material = plane.material as THREE.ShaderMaterial;
-          // material.uniforms.uTexture.value = texture;
           // material.wireframe = true; // Enable wireframe mode
   
           // Update the "progress" uniform based on scroll delta
           if (material.uniforms.progress) {
             material.uniforms.progress.value = -1.0 * (clampedScrollY * 0.001 + planeSpacing * index);
+            // plane.position.y = -clampedScrollY * 0.001 + index * planeSpacing;
+            // console.log('plane.position.y :>> ', plane.position.y);
           }
         }
       });
@@ -115,35 +131,58 @@ const PlaneComponent = () => {
 
 
   // make empty array with 5 elements
-  const planes = new Array(texturePaths.length).fill(null);
+  // const planes = new Array(texturePaths.length).fill(null);
+  const planes = [1, 2, 3, 4]
   // console.log('scrollProgress :>> ', scrollProgress);
   // console.log('scrollY :>> ', scrollY);
 
   // Handle plane click event
-  const handlePlaneClick = (event: ThreeEvent<MouseEvent>, num: number) => {
+  // const handlePlaneClick = (event: ThreeEvent<MouseEvent>) => {
+  //   event.stopPropagation();
+  //   // console.log('event :>> ', event);
+  //   // console.log('event.object.material.uniforms.uTexture.value.source.data.currentSrc :>> ', event.object.material.uniforms.uTexture.value.source.data.currentSrc);
+
+  //   const clickedIndex = event.object.userData.index;
+  //   console.log('clickedIndex :>> ', clickedIndex);
+
+  // };
+  const handlePlaneClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
 
-    // Retrieve the plane's index from userData
-    const clickedIndex = event.object.userData.index; // Use object.userData to access the correct index
+    const clickedIndex = event.eventObject.userData.index;
+    console.log('Clicked Plane Index:', clickedIndex);
     setClickedPlane(clickedIndex);
 
-    console.log(`Plane ${num} clicked`);
+    // Additional logic when a plane is clicked
+    // e.g., navigate to a new page, highlight the plane, etc.
   };
 
   return (
     <>
-      {planes.map((_, index) => (
-        <mesh
-          key={index}
-          // position={[0, 6 - index * 2.5, 0]}
-          // position={[0, 6 - index * planeSpacing, 0]}
-          ref={(ref) => (planeRefs.current[index] = ref)} // Store ref for each plane
-          onClick={(e) => handlePlaneClick(e, planeRefs.current[index]?.userData.index)}         
-        >
-          <planeGeometry args={[3, 1.6, 100, 100]} />
-          <planeMaterial attach="material" />
-        </mesh>
-      ))}
+      {planes.map((plane, index) => {
+        // const positionY = 0; // Keep Y position same if desired
+        const positionY = -clmpScrollY * 0.001 + planeSpacing * index;
+        const position: [number, number, number] = [0, positionY, index * 0.01]; // Slightly offset in Z to prevent z-fighting
+
+        return (
+          <mesh
+            key={index}
+            // position={[position[0], position[1] - clmpScrollY * 0.001 + planeSpacing * index, position[2]]}
+            position={position}
+            ref={(ref) => {
+              planeRefs.current[index] = ref;
+              if (ref) {
+                ref.userData.index = index;
+              }
+            }}
+            // userData={{ index }} 
+            onClick={handlePlaneClick}
+          >
+            <planeGeometry args={[3, 1.6, 100, 100]} />
+            <planeMaterial attach="material" />
+          </mesh>
+        );
+      })}
     </>
   );
 }

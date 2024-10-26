@@ -8,11 +8,11 @@ function App() {
     <div className='page-container'>
       <div className="plane">
         <Canvas gl={{ antialias: true }}>
-          <PerspectiveCamera makeDefault fov={20} position={[0, 0, 10]} />
+          <PerspectiveCamera makeDefault fov={20} position={[0, 0, 13]} />
           <ambientLight intensity={0.5} />
           <directionalLight position={[0, 0, 10]} />
           <PlaneComponent />
-          {/* <OrbitControls enableDamping enableZoom={false} /> */}
+          <OrbitControls enableZoom={false} />
         </Canvas>
       </div>
       
@@ -20,4 +20,4 @@ function App() {
   )
 }
 
-export default App
+export default App;
