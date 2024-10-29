@@ -1,6 +1,6 @@
 precision mediump float;
 
-uniform float progress;
+// uniform float progress;
 
 varying vec2 vUv;
 varying vec3 vPosition;
@@ -44,15 +44,19 @@ void main() {
     vec4 worldPosition = modelMatrix * vec4(position, 1.0);
 
     // Parameters for the bulge effect
-    float bulgeAmount = 3.0;    // Adjust this to control bulge depth
+    float bulgeAmount = 4.0;    // Adjust this to control bulge depth
     float bulgeCenterY = 0.0;   // Y-coordinate in world space where bulge is centered
-    float bulgeWidth = 1.8;     // Controls how wide the bulge effect is along the Y-axis
+    float bulgeWidth = 1.2;     // Controls how wide the bulge effect is along the Y-axis
 
     // Calculate the distance from the bulge center along the Y-axis
     float yDistance = worldPosition.y - bulgeCenterY;
 
-    // Compute the bulge factor using a Gaussian function for smoothness
-    float bulgeFactor = bulgeAmount * exp(-pow(yDistance / bulgeWidth, 2.0));
+    // // Compute the bulge factor using a Gaussian function for smoothness
+    // float bulgeFactor = bulgeAmount * exp(-pow(yDistance / bulgeWidth, 2.0));
+
+    // Compute the bulge factor using a semicircular profile
+    float ratio = yDistance / bulgeWidth;
+    float bulgeFactor = bulgeAmount * sqrt(max(0.0, 1.0 - ratio * ratio));
 
     // Apply the bulge effect to the Z-coordinate in world space
     worldPosition.z += bulgeFactor;

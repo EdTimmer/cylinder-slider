@@ -31,7 +31,7 @@ void main() {
   // #include <colorspace_fragment>
     // Define inner and outer edges for the fade effect
   float innerEdge = 0.7;  // Start of fade
-  float outerEdge = 0.75; // End of fade (discard beyond this)
+  float outerEdge = 0.95; // End of fade (discard beyond this)
 
   // Absolute Y-position to handle both edges
   float absY = abs(vPosition.y);

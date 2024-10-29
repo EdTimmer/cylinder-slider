@@ -40,10 +40,14 @@ declare global {
   }
 }
 
-const PlaneComponent = () => {
+interface Props {
+  setSelectedPlane: (index: number) => void;
+}
+
+const PlaneComponent = ({setSelectedPlane}: Props) => {
   const initialScrollY = 0;
   const [scrollY, setScrollY] = useState(initialScrollY);
-  const [clickedPlane, setClickedPlane] = useState<number | null>(null);
+  // const [clickedPlane, setClickedPlane] = useState<number | null>(null);
   const [clmpScrollY, setClmpScrollY] = useState(initialScrollY);
 
 
@@ -58,7 +62,7 @@ const PlaneComponent = () => {
 
   const textures = useLoader(THREE.TextureLoader, texturePaths);
 
-  const planeSpacing = 1.8;
+  const planeSpacing = 1.3;
   const totalPlanes = texturePaths.length;
 
   // Calculate the scroll boundaries (based on the number of planes)
@@ -151,7 +155,8 @@ const PlaneComponent = () => {
 
     const clickedIndex = event.eventObject.userData.index;
     console.log('Clicked Plane Index:', clickedIndex);
-    setClickedPlane(clickedIndex);
+    // setClickedPlane(clickedIndex);
+    setSelectedPlane(clickedIndex);
 
     // Additional logic when a plane is clicked
     // e.g., navigate to a new page, highlight the plane, etc.
@@ -178,7 +183,7 @@ const PlaneComponent = () => {
             // userData={{ index }} 
             onClick={handlePlaneClick}
           >
-            <planeGeometry args={[3, 1.6, 100, 100]} />
+            <planeGeometry args={[2.2, 1.2, 100, 100]} />
             <planeMaterial attach="material" />
           </mesh>
         );

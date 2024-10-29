@@ -19,3 +19,9 @@
   width: 900px;
   height: 900px;
 }
+
+.info {
+  color: white;
+  font-size: 2rem;
+  margin-top: 2rem;
+}
