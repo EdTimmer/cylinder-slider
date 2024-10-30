@@ -5,46 +5,47 @@ import * as THREE from 'three';
 import planeVertexShader from '../../assets/shaders/vertex.glsl?raw';
 import planeFragmentShader from '../../assets/shaders/fragment.glsl?raw';
 import VirtualScroll from 'virtual-scroll';
+import Panel from '../Panel/Panel';
 
-const PlaneMaterial = shaderMaterial(
-  {
-    time: 0,
-    color: new THREE.Color(0.0, 0.0, 0.0),
-    progress: 0.0,
-    pos: 0.0,
-    uTexture: null,
-  },
-  planeVertexShader,
-  planeFragmentShader
-);
+// const ScrollCylinderMaterial = shaderMaterial(
+//   {
+//     time: 0,
+//     color: new THREE.Color(0.0, 0.0, 0.0),
+//     progress: 0.0,
+//     pos: 0.0,
+//     uTexture: null,
+//   },
+//   planeVertexShader,
+//   planeFragmentShader
+// );
 
-// Set default material properties on the prototype
-Object.assign(PlaneMaterial.prototype, {
-  transparent: true,
-  depthWrite: false,
-  blending: THREE.CustomBlending,
-  premultipliedAlpha: true,
-  blendEquation: THREE.AddEquation,
-  blendSrc: THREE.OneFactor,
-  blendDst: THREE.OneMinusSrcAlphaFactor,
-});
+// // Set default material properties on the prototype
+// Object.assign(ScrollCylinderMaterial.prototype, {
+//   transparent: true,
+//   depthWrite: false,
+//   blending: THREE.CustomBlending,
+//   premultipliedAlpha: true,
+//   blendEquation: THREE.AddEquation,
+//   blendSrc: THREE.OneFactor,
+//   blendDst: THREE.OneMinusSrcAlphaFactor,
+// });
 
-// Make shader material available in JSX
-extend({ PlaneMaterial });
+// // Make shader material available in JSX
+// extend({ PlaneMaterial: ScrollCylinderMaterial });
 
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      planeMaterial: ReactThreeFiber.Object3DNode<THREE.ShaderMaterial, typeof PlaneMaterial>;
-    }
-  }
-}
+// declare global {
+//   namespace JSX {
+//     interface IntrinsicElements {
+//       planeMaterial: ReactThreeFiber.Object3DNode<THREE.ShaderMaterial, typeof ScrollCylinderMaterial>;
+//     }
+//   }
+// }
 
 interface Props {
   setSelectedPlane: (index: number) => void;
 }
 
-const PlaneComponent = ({setSelectedPlane}: Props) => {
+const ScrollCylinder = ({setSelectedPlane}: Props) => {
   const initialScrollY = 0;
   const [scrollY, setScrollY] = useState(initialScrollY);
   // const [clickedPlane, setClickedPlane] = useState<number | null>(null);
@@ -152,14 +153,8 @@ const PlaneComponent = ({setSelectedPlane}: Props) => {
   // };
   const handlePlaneClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
-
     const clickedIndex = event.eventObject.userData.index;
-    console.log('Clicked Plane Index:', clickedIndex);
-    // setClickedPlane(clickedIndex);
     setSelectedPlane(clickedIndex);
-
-    // Additional logic when a plane is clicked
-    // e.g., navigate to a new page, highlight the plane, etc.
   };
 
   return (
@@ -170,27 +165,23 @@ const PlaneComponent = ({setSelectedPlane}: Props) => {
         const position: [number, number, number] = [0, positionY, index * 0.01]; // Slightly offset in Z to prevent z-fighting
 
         return (
-          <mesh
+          <Panel
             key={index}
-            // position={[position[0], position[1] - clmpScrollY * 0.001 + planeSpacing * index, position[2]]}
+            index={index}
             position={position}
+            handlePlaneClick={handlePlaneClick}
             ref={(ref) => {
               planeRefs.current[index] = ref;
               if (ref) {
                 ref.userData.index = index;
               }
             }}
-            // userData={{ index }} 
-            onClick={handlePlaneClick}
-          >
-            <planeGeometry args={[2.2, 1.2, 100, 100]} />
-            <planeMaterial attach="material" />
-          </mesh>
+          />
         );
       })}
     </>
   );
 }
 
-export default PlaneComponent;
+export default ScrollCylinder;
 

@@ -1,7 +1,7 @@
 import './App.css'
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
-import PlaneComponent from './components/PlaneComponent/PlaneComponent';
+import ScrollCylinder from './components/ScrollCylinder/ScrollCylinder';
 import { useState } from 'react';
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
           <PerspectiveCamera makeDefault fov={20} position={[0, 0, 13]} />
           <ambientLight intensity={0.5} />
           <directionalLight position={[0, 0, 10]} />
-          <PlaneComponent setSelectedPlane={setSelectedPlane} />
+          <ScrollCylinder setSelectedPlane={setSelectedPlane} />
           <OrbitControls enableZoom={false} />
         </Canvas>
       </div>
